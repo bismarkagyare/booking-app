@@ -28,6 +28,18 @@ app.use('/api/users', usersRouter);
 app.use('/api/hotels', hotelsRouter);
 app.use('/api/rooms', roomsRouter);
 
+app.use((error, req, res, next) => {
+  const errorMessage = error.message || 500;
+  const errorStatus = error.status || 'Something went wrong';
+  res.status(errorStatus).json({
+    success: false,
+    message: errorMessage,
+    status: errorStatus,
+    stack: error.stack,
+  });
+  next();
+});
+
 app.listen('8000', () => {
   connect();
   console.log('connected to server');
