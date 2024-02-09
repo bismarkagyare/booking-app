@@ -1,11 +1,11 @@
 import User from '../models/User.js';
-import bycrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import { createError } from '../utils/error.js';
 
 export const register = async (req, res, next) => {
   try {
-    const salt = bycrypt.genSaltSync(10);
-    const hash = bycrypt.hashSync(req.body.password, salt);
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(req.body.password, salt);
 
     const newUser = new User({
       username: req.body.username,
@@ -22,21 +22,21 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const user = await User.findOne(req.body.username);
-    if (!user) {
+    const foundUser = await User.findOne({ username: req.body.username });
+    if (!foundUser) {
       return createError(404, 'User not found');
     }
 
-    const isPasswordCorrect = await bycrypt.compare(
+    const isPasswordCorrect = await bcrypt.compare(
       req.body.password,
-      user.password
+      foundUser.password
     );
 
     if (!isPasswordCorrect) {
       return createError(404, 'Password incorrect');
     }
 
-    const { password, isAdmin, ...otherDetails } = user._doc;
+    const { password, isAdmin, ...otherDetails } = foundUser;
     res.status(200).json({ ...otherDetails });
   } catch (error) {
     next(error);
