@@ -42,7 +42,7 @@ export const login = async (req, res, next) => {
       process.env.JWT_SECRET
     );
 
-    const { password, isAdmin, ...otherDetails } = foundUser;
+    const { password, isAdmin, ...otherDetails } = foundUser._doc;
     res
       .cookie('access_token', token, { httpOnly: true })
       .status(200)
